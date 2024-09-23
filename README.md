@@ -2,24 +2,6 @@
 
 PR2 is the next iteration in the evolution of SoA non-deterministic planning.
 
-## ![siren image](https://img.icons8.com/color/48/000000/warning-shield.png) WARNING ![siren image](https://img.icons8.com/color/48/000000/warning-shield.png)
-
-This is a rewrite of the PR2 planner, described in detail over [[here](https://mulab.ai/project/pr2/)]. *It is non-operational!!!*
-
-The purpose of this repository is to house the eventual re-working of the PR2 planner so that it maintains working operability with the latest version of FastDownward. This includes a fork of the [FastDownward repository](https://github.com/aibasel/downward), and will be updated regularly. Until this worning message is removed, the code found here should *not* be considered operational.
-
-## Stript Usage
-
-* **setup**: Initializes and fetches the latest for all submodules (essential!).
-* **build**: Builds PR2.
-* **pr2**: Runs the planner.
-* **vizualize**: Visualizes the plan.
-
-----
-
-What follows is the original README from the PR2 release. The FastDownward README can be found at [FD-README.md](FD-README.md).
-
-
 ## Docker Usage
 
 To build the docker image where things should "just work":
@@ -31,7 +13,7 @@ docker build -t pr2 .
 To run the docker image and mount the local directory as a volume:
 
 ```bash
-docker run --cpus 1 -it -v $(pwd):/PROJECT pr2
+docker run -it -v $(pwd):/PROJECT pr2
 ```
 
 ## Planners Available
@@ -52,7 +34,7 @@ Every effort was made to patch and configure each planner to their full potentia
 All of the evaluation settings can be found by running the `evaluate.py` script:
 
 ```bash
-python pr2-scripts/evaluate.py --help
+python prp-scripts/evaluate.py --help
 ```
 
 **Note**: It assumes that you are in the `pr2` docker container to run things.
@@ -65,9 +47,9 @@ If you have multiple cores available to run evaluations, you can "cache" the sol
 * store the cache of solver calls in the `CACHE/` folder
 
 ```bash
-python pr2-scripts/evaluate.py --catalogue /PROJECT/fond-benchmarks/ --collection all-fond-papers --output RESULTS --cache CACHE --planner pr2
+python prp-scripts/evaluate.py --catalogue /PROJECT/fond-benchmarks/ --collection all-fond-papers --output RESULTS --cache CACHE --planner pr2
 
-python pr2-scripts/evaluate.py --catalogue /PROJECT/fond-benchmarks/ --collection all-fond-papers --output RESULTS --cache CACHE --planner prp
+python prp-scripts/evaluate.py --catalogue /PROJECT/fond-benchmarks/ --collection all-fond-papers --output RESULTS --cache CACHE --planner prp
 ```
 Then, to start a thread of solving, navigate to the `CACHE/` directory and run the script:
 
@@ -84,7 +66,7 @@ watch 'echo "scale=1 ; 100 * `ls -l RESULTS | wc -l` / (`ls -l CACHE | wc -l` + 
 
 ### Analyzing the results
 
-All of the analysis exists in a jupyter notebook found in the `pr2-scripts` directory. You can run the notebook by loading a dockerized jupyter notebook server from the top-level directory of this repository:
+All of the analysis exists in a jupyter notebook found in the `prp-scripts` directory. You can run the notebook by loading a dockerized jupyter notebook server from the top-level directory of this repository:
 
 ```bash
 docker run -it --rm -p 8888:8888 -v "${PWD}":/home/jovyan/work jupyter/datascience-notebook:9e63909e0317

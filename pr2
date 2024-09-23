@@ -3,7 +3,7 @@
 set -e
 
 # Settings
-BASEDIR="$(dirname "$0")/core/downward"
+BASEDIR="$(dirname "$0")"
 DEBUG_BUILD="debug64"
 RELEASE_BUILD="release64"
 
@@ -101,7 +101,7 @@ function run {
         shift
     else
         # checks if there are any symmetries to play with
-        timeout "$OBJ_SAMPLE_CHECK_LIMIT" bash -c "python $BASEDIR/pr2-scripts/sample_objects.py --domain $1 --problem $2 --output object-sampled-problem.pddl --sample -1 > object-sampled-output.txt" || true
+        timeout "$OBJ_SAMPLE_CHECK_LIMIT" bash -c "python $BASEDIR/prp-scripts/sample_objects.py --domain $1 --problem $2 --output object-sampled-problem.pddl --sample -1 > object-sampled-output.txt" || true
 
         if grep -q "True" object-sampled-output.txt; then
 
@@ -112,7 +112,7 @@ function run {
             # Iterate over the object sampling indices
             for i in ${!OBJ_SAMPLE_RATES[@]}; do
                 echo "Testing with ${OBJ_SAMPLE_RATES[$i]} symmetric objects for a max of ${OBJ_SAMPLE_TIMES[$i]} seconds..."
-                python $BASEDIR/pr2-scripts/sample_objects.py --domain "$1" --problem "$2" --output object-sampled-problem.pddl --sample "${OBJ_SAMPLE_RATES[$i]}"
+                python $BASEDIR/prp-scripts/sample_objects.py --domain "$1" --problem "$2" --output object-sampled-problem.pddl --sample "${OBJ_SAMPLE_RATES[$i]}"
 
                 timeout "${OBJ_SAMPLE_TIMES[$i]}" bash -c "$BASEDIR/pr2 --disable-object-sampling $1 object-sampled-problem.pddl --final-fsap-free-round 0 ${@:3} > object-sampled-subsolve.txt 2>&1" || true
 
@@ -139,7 +139,7 @@ function run {
     shift 2
 
     set -e
-    $FD$OPT output.sas --search "pr2search()" "$@" || true
+    $FD$OPT output.sas --search "prpsearch()" "$@" || true
     echo
 
 }
@@ -167,7 +167,7 @@ elif [ "--strong" = "$1" ]; then
         echo "Compiling domain..." > $STRONG_OUTPUT
         echo "" >> $STRONG_OUTPUT
 
-        python $BASEDIR/pr2-scripts/strong-acyclic-conversion.py "$2" strong-domain.pddl "$i" >> $STRONG_OUTPUT 2>&1
+        python $BASEDIR/prp-scripts/strong-acyclic-conversion.py "$2" strong-domain.pddl "$i" >> $STRONG_OUTPUT 2>&1
         echo "" >> $STRONG_OUTPUT
 
         echo "Solving compiled problem..." >> $STRONG_OUTPUT
@@ -197,13 +197,13 @@ elif [ "--strong" = "$1" ]; then
 elif [ "--validate" = "$1" ]; then
     shift
     run "$@" --output-format 2
-    python pr2-scripts/translate_policy.py > human_policy.out
-    python pr2-scripts/validator.py $1 $2 human_policy.out pr2
+    python prp-scripts/translate_policy.py > human_policy.out
+    python prp-scripts/validator.py $1 $2 human_policy.out prp
     dot -Tpng graph.dot > graph.png
 elif [ "--full-validation" = "$1" ]; then
     echo
 
-    for dir in pr2-scripts/validators/benchmarks/*/; do
+    for dir in prp-scripts/validators/benchmarks/*/; do
         printf "%26s " $(basename $dir)
         "$BASEDIR/pr2" --validate $dir/d.pddl $dir/p.pddl > validate.out 2>&1 || true
         check_valid
