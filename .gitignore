@@ -1,2 +1,4 @@
 builds/*
 *out
+RESULTS/*
+*pyc
